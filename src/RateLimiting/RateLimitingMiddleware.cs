@@ -20,42 +20,30 @@ namespace Hellang.Middleware.RateLimiting
         
         private RateLimitingOptions Options { get; }
 
-        public Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context)
         {
-            if (IsSafelisted(context))
+            if (await Options.IsSafelisted(context))
             {
-                return Next(context);
+                await Next(context);
+                return;
             }
 
-            if (IsBlocklisted(context))
+            if (await Options.IsBlocklisted(context))
             {
-                return Block(context);
+                await Block(context);
+                return;
             }
 
-            if (IsThrottled(context))
+            if (await Options.IsThrottled(context, Cache))
             {
-                return Throttle(context);
+                await Throttle(context);
+                return;
             }
 
-            return Next(context);
-        }
-
-        private bool IsSafelisted(HttpContext context)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        private bool IsBlocklisted(HttpContext context)
-        {
-            throw new System.NotImplementedException();
+            await Next(context);
         }
 
         private Task Block(HttpContext context)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        private bool IsThrottled(HttpContext context)
         {
             throw new System.NotImplementedException();
         }
